@@ -1,7 +1,7 @@
 import { Text, Image, TouchableOpacity } from "react-native";
 import React from "react";
-import { style } from "../Styles/globalStyles";
 import ProductDetails from "./productDetails";
+import { StyleSheet } from "react-native";
 
 type ProductCardProps = {
   name: string;
@@ -45,3 +45,27 @@ export default function ProductCard({
     </>
   );
 }
+
+const style = StyleSheet.create({
+  productImage: {
+    width: "100%",
+    height: 100,
+    borderRadius: 12,
+    resizeMode: "cover",
+    marginBottom: 8,
+  },
+
+  productCard: {
+    borderRadius: 16,
+    backgroundColor: "#ffffff", // fondo limpio
+    padding: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
+    margin: 8,
+    width: 160,
+  },
+
+});
