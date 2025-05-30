@@ -8,6 +8,7 @@ import {
   Alert,
 } from "react-native";
 import { loginUser } from "../../authService"; // Asegúrate de que la ruta sea correcta
+import { styles } from "../../Styles/globalStyles"; // Asegúrate de que la ruta sea correcta
 
 const Login = ({ onSwitch }: { onSwitch: () => void }) => {
   const [email, setEmail] = useState("");
@@ -25,11 +26,11 @@ const Login = ({ onSwitch }: { onSwitch: () => void }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Iniciar Sesión</Text>
+    <View style={styles.containerLogin}>
+      <Text style={styles.titleLogin}>Iniciar Sesión</Text>
       <TextInput
         placeholder="Correo electrónico"
-        style={styles.input}
+        style={styles.inputLogin}
         autoCapitalize="none"
         value={email}
         onChangeText={setEmail}
@@ -37,15 +38,15 @@ const Login = ({ onSwitch }: { onSwitch: () => void }) => {
       <TextInput
         placeholder="Contraseña"
         secureTextEntry
-        style={styles.input}
+        style={styles.inputLogin}
         value={password}
         onChangeText={setPassword}
       />
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
+      <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin}>
+        <Text style={styles.buttonTextLogin}>Entrar</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onSwitch}>
-        <Text style={styles.switchText}>¿No tienes cuenta? Regístrate</Text>
+        <Text style={styles.switchTextLogin}>¿No tienes cuenta? Regístrate</Text>
       </TouchableOpacity>
     </View>
   );
@@ -54,43 +55,3 @@ const Login = ({ onSwitch }: { onSwitch: () => void }) => {
 export default Login;
 
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    padding: 24,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 6,
-    padding: 12,
-    marginBottom: 15,
-  },
-  button: {
-    backgroundColor: "#007bff",
-    padding: 15,
-    borderRadius: 6,
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: "white",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  switchText: {
-    color: "#007bff",
-    textAlign: "center",
-    marginTop: 10,
-  },
-});

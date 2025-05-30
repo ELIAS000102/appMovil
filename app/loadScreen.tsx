@@ -1,6 +1,7 @@
 import { View, Text, Image, StyleSheet, Animated, Easing } from 'react-native';
 import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
+import { styles } from '../Styles/globalStyles'; // Asegúrate de que la ruta sea correcta
 
 export default function LoadScreen() {
   const router = useRouter();
@@ -72,34 +73,3 @@ export default function LoadScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff', // Fondo blanco
-  },
-  logo: {
-    width: 200,
-    height: 200,
-    marginBottom: 30,
-    borderRadius: 20,
-  },
-  text: {
-    fontSize: 20,
-    marginBottom: 20,
-    color: '#333',
-  },
-  barsContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    height: 60,
-  },
-  bar: {
-    width: 10,
-    height: 40,
-    backgroundColor: '#007AFF',
-    marginHorizontal: 5,
-    borderRadius: 5,
-  },
-});

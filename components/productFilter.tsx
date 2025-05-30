@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import { TextInput, TouchableOpacity, Animated } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
+import { styles } from "../Styles/globalStyles"; // Asegúrate de que la ruta sea correcta
 
 interface SearchBarProps {
   onSearch: (term: string) => void; // Función que se llamará al buscar
@@ -31,17 +32,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   return (
     <React.Fragment>
       {/* 🔍 Área de búsqueda */}
-      <TouchableOpacity onPress={toggleSearch} style={style.searchButton}>
+      <TouchableOpacity onPress={toggleSearch} style={styles.searchButton}>
         <Ionicons name="search" size={24} color="white" />
       </TouchableOpacity>
 
-      <Animated.View style={[style.searchInputWrapper, { width: inputWidth }]}>
+      <Animated.View style={[styles.searchInputWrapper, { width: inputWidth }]}>
         {searchVisible && (
           <TextInput
             placeholder="Buscar producto..."
             value={searchTerm}
             onChangeText={handleSearchChange}
-            style={style.searchInput}
+            style={styles.searchInput}
             autoFocus
           />
         )}
@@ -52,27 +53,4 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
 export default SearchBar;
 
-const style = StyleSheet.create({
-  searchButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: "#2C3E50", // azul oscuro
-    borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
 
-  searchInputWrapper: {
-    marginLeft: 10,
-    overflow: "hidden",
-  },
-
-  searchInput: {
-    height: 40,
-    paddingHorizontal: 10,
-    backgroundColor: "white", // gris claro profesional
-    borderRadius: 10,
-    width: 240, // ancho del input
-    color: "black", // texto azul oscuro
-  },
-});

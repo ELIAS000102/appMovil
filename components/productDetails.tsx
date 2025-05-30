@@ -10,6 +10,7 @@ import {
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
 import CartModal from "../components/CartModal";
+import { styles } from "../Styles/globalStyles"; // Asegúrate de que la ruta sea correcta
 
 type ProductDetailsProps = {
   visible: boolean;
@@ -65,7 +66,7 @@ export default function ProductDetails({
         animationIn="zoomIn"
         animationOut="zoomOut"
         backdropOpacity={0.3}
-        style={{ margin: 0 }}
+        style={{ flex: 1, margin: 0 }} // Asegúrate de que el modal ocupe toda la pantalla
       >
         <View style={styles.fullScreenModal}>
           {/* Botón de volver */}
@@ -107,67 +108,4 @@ export default function ProductDetails({
   );
 }
 
-const { height } = Dimensions.get("window");
 
-const styles = StyleSheet.create({
-  fullScreenModal: {
-    flex: 1,
-    backgroundColor: "white",
-  },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },
-  modalContent: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-  },
-  productImage: {
-    width: "100%",
-    height: height * 0.4,
-    resizeMode: "cover",
-    borderRadius: 10,
-  },
-  productName: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginTop: 20,
-    textAlign: "center",
-  },
-  productPrice: {
-    fontSize: 18,
-    color: "#4caf50",
-    marginTop: 10,
-  },
-  quantityContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 20,
-  },
-  quantityButton: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 8,
-  },
-  quantityText: {
-    fontSize: 16,
-    marginHorizontal: 20,
-  },
-  addToCartButton: {
-    backgroundColor: "#4caf50",
-    padding: 15,
-    borderRadius: 5,
-    alignItems: "center",
-    margin: 20,
-  },
-  addToCartText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});

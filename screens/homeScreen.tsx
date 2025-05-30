@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import SearchBar from "../components/productFilter";
 import ButtonLogin from "@/components/buttonLogin";
 import { StyleSheet } from "react-native";
+import {styles} from "../Styles/globalStyles";
 
 
 export default function Galeria() {
@@ -26,14 +27,14 @@ export default function Galeria() {
    
   return (
     <><View>
-      <Text style={style.galery_title}>Galería de Productos</Text>
+      <Text style={styles.galeryTitle}>Galería de Productos</Text>
     </View><View style={{ flex: 1, padding: 10 }}>
         {/* 🔍 Agregar SearchBar */}
-        <View style={style.searchContainer}>
+        <View style={styles.searchContainer}>
           <SearchBar onSearch={handleSearch} />
           <ButtonLogin />
         </View>
-        <ScrollView contentContainerStyle={style.containerProducts}>
+        <ScrollView contentContainerStyle={styles.containerProducts}>
           {filteredProducts.map((product, index) => (
             <ProductCard
               key={index}
@@ -49,25 +50,3 @@ export default function Galeria() {
   );
 }
 
-const style = StyleSheet.create({
-   galery_title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 20,
-  },
-
-  searchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    marginTop: 30,
-  },
-
-    containerProducts: {
-    padding: 10,
-    justifyContent: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-})
