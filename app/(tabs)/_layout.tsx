@@ -7,36 +7,37 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#ffffff", // Iconos activos en blanco
-        tabBarInactiveTintColor: "#D1B2E0", // Iconos inactivos en morado claro
+        tabBarActiveTintColor: "#ffffff",
+        tabBarInactiveTintColor: "#A0C4FF", // azul claro
         tabBarStyle: {
-          backgroundColor: "#5E2A84", // Fondo morado oscuro
-          borderTopWidth: 0, // Sin borde superior
-          elevation: 10, // Sombra para Android
-          shadowColor: "#000", // Sombra para iOS
+          backgroundColor: "#1E40AF", // azul oscuro
+          borderTopWidth: 0,
+          elevation: 10,
+          shadowColor: "#000",
           shadowOpacity: 0.1,
           shadowOffset: { width: 0, height: -2 },
           shadowRadius: 10,
-          borderTopLeftRadius: 50, // Bordes redondeados
-          borderTopRightRadius: 50,
-          height: 100, // Altura más grande
-          paddingBottom: 10, // Espacio para los iconos
-          paddingTop: 10, // Espacio para los iconos
-          position: "absolute", // Posición absoluta para evitar superposición
-          bottom: 0, // Alinear al fondo de la pantalla
-          left: 0,
-          right: 0, // Alinear a los lados de la pantalla 
-          zIndex: 100, // Asegurar que esté por encima de otros componentes
+          height: 90,
+          paddingBottom: 10,
+          paddingTop: 10,
+          position: "absolute",
+          bottom: 10,
+          left: 20,
+          right: 20,
+          marginHorizontal: 20,
+          zIndex: 100,
+          borderRadius: 40,
+          overflow: "hidden",
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "bold",
         },
         headerStyle: {
-          backgroundColor: "#5E2A84", // Color morado oscuro para la barra superior
+          backgroundColor: "#1E40AF", // azul oscuro
         },
-        headerTintColor: "#fff", // Texto blanco en la barra superior
-        animation: "fade", // Animación de transición más fluida
+        headerTintColor: "#fff",
+        animation: "fade",
       }}
     >
       <Tabs.Screen
@@ -64,6 +65,7 @@ export default function TabLayout() {
         options={{
           title: "Ajustes",
           headerShown: false,
+          headerPressOpacity: 0,
           tabBarIcon: ({ color }) => (
             <Feather name="settings" color={color} size={26} />
           ),

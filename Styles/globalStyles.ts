@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     marginBottom: 20,
-    color: "#5E2A84", // texto morado oscuro
+    color: "#2E7D32", // verde oscuro
   },
   barsContainer: {
     flexDirection: "row",
@@ -29,7 +29,7 @@ export const styles = StyleSheet.create({
   bar: {
     width: 10,
     height: 40,
-    backgroundColor: "#9B59B6", // morado vibrante
+    backgroundColor: "#43A047", // verde vibrante
     marginHorizontal: 5,
     borderRadius: 5,
   },
@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#5E2A84", // morado oscuro
+    color: "#2E7D32", // verde oscuro
   },
   inputLogin: {
     borderWidth: 1,
@@ -58,7 +58,7 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
   buttonLogin: {
-    backgroundColor: "#9B59B6", // morado vibrante
+    backgroundColor: "#43A047", // verde vibrante
     padding: 15,
     borderRadius: 6,
     marginBottom: 10,
@@ -69,7 +69,7 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   switchTextLogin: {
-    color: "#9B59B6", // morado vibrante
+    color: "#43A047", // verde vibrante
     textAlign: "center",
     marginTop: 10,
   },
@@ -88,7 +88,7 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#5E2A84", // morado oscuro
+    color: "#2E7D32", // verde oscuro
   },
   inputSingIn: {
     borderWidth: 1,
@@ -98,7 +98,7 @@ export const styles = StyleSheet.create({
     marginBottom: 15,
   },
   buttonSingIn: {
-    backgroundColor: "#8E44AD", // morado intenso
+    backgroundColor: "#388E3C", // verde intenso
     padding: 15,
     borderRadius: 6,
     marginBottom: 10,
@@ -109,17 +109,16 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   switchTextSingIn: {
-    color: "#8E44AD", // morado intenso
+    color: "#388E3C", // verde intenso
     textAlign: "center",
     marginTop: 10,
   },
   //Estilos del botón de login en la pantalla principal (buttonLogin.tsx)
   loginButtonHome: {
-    backgroundColor: "#5E2A84", // morado oscuro
+    backgroundColor: "#2E7D32", // verde oscuro
     padding: 10,
     borderRadius: 20,
     alignItems: "center",
-    position: "absolute", // 🟡 CLAVE
     right: 10,
     width: 70, // ancho del botón
     height: 40, // alto del botón
@@ -141,7 +140,7 @@ export const styles = StyleSheet.create({
   message: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#8E44AD", // morado intenso
+    color: "#388E3C", // verde intenso
     marginTop: 10,
   },
   // Estilos del componente de tarjeta de producto (productCard.tsx)
@@ -193,11 +192,11 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
     textAlign: "center",
-    color: "#5E2A84", // morado oscuro
+    color: "#2E7D32", // verde oscuro
   },
   productPrice: {
     fontSize: 18,
-    color: "#8E44AD", // morado intenso
+    color: "#388E3C", // verde intenso
     marginTop: 10,
   },
   quantityContainer: {
@@ -216,7 +215,7 @@ export const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   addToCartButton: {
-    backgroundColor: "#9B59B6", // morado vibrante
+    backgroundColor: "#43A047", // verde vibrante
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
@@ -231,7 +230,7 @@ export const styles = StyleSheet.create({
   searchButton: {
     width: 40,
     height: 40,
-    backgroundColor: "#5E2A84", // morado oscuro
+    backgroundColor: "#2E7D32", // verde oscuro
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -297,14 +296,13 @@ export const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#5E2A84", // morado oscuro
+    color: "#2E7D32", // verde oscuro
   },
 
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    marginTop: 30,
+    padding: 20,
   },
 
   containerProducts: {
@@ -312,5 +310,6 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     flexWrap: "wrap",
+    paddingBottom: 200, // Espacio al final para evitar que el último producto quede pegado al borde
   },
 });

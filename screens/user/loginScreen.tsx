@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Modal, View, Text, TouchableOpacity } from "react-native";
 import Login from "@/components/loginContainer/login";
 import SignIn from "@/components/loginContainer/singIn";
 import { styles } from "@/Styles/globalStyles";
@@ -25,7 +25,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ visible, onClose }) => {
           </TouchableOpacity>
 
           {isLogin ? (
-            <Login onSwitch={toggleForm} />
+            <Login onSwitch={toggleForm} onClose={onClose} />
           ) : (
             <SignIn onSwitch={toggleForm} />
           )}
@@ -36,5 +36,3 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ visible, onClose }) => {
 };
 
 export default LoginScreen;
-
-

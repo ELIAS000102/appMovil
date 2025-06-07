@@ -6,151 +6,141 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  Modal,
+  Alert,
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useAuth } from '../authentication/useAuth';
+import { updateUser, logout } from '../authentication/authService';
 
 export default function User() {
-  // Estados para mostrar la contraseña o no
+  const { user } = useAuth();
+  const [editableUser, setEditableUser] = useState({ ...user });
+  const [editingField, setEditingField] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [showCart, setShowCart] = useState(false);
 
-  // Estados de edición individual
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
-  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  if (!user) return null;
 
-  // Datos del usuario
-  const [name, setName] = useState('Juan Pérez');
-  const [email, setEmail] = useState('usuario@email.com');
-  const [password, setPassword] = useState('12345678');
-  const [address, setAddress] = useState('Calle 123, Ciudad');
-  const [phone, setPhone] = useState('555-123-4567');
+  const handleChange = (field: string, value: string) => {
+    setEditableUser((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditField = (field: string) => {
+    setEditingField(field);
+  };
+
+  const handleFinishEditing = () => {
+    Alert.alert(
+      '¿Guardar cambios?',
+      '¿Deseas guardar los cambios realizados?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => {
+            setEditableUser({ ...user });
+            setEditingField(null);
+          },
+          style: 'cancel',
+        },
+        {
+          text: 'Guardar',
+          onPress: () => {
+            updateUser(editableUser);
+            setEditingField(null);
+            Alert.alert('Guardado', 'La información ha sido actualizada.');
+          },
+        },
+      ]
+    );
+  };
+
+  const EditableField = ({
+    label,
+    field,
+    value,
+    isPassword = false,
+  }: {
+    label: string;
+    field: string;
+    value: string;
+    isPassword?: boolean;
+  }) => (
+    <View style={styles.infoSection}>
+      <Text style={styles.label}>{label}</Text>
+
+      <View style={styles.fieldContainer}>
+        {editingField === field ? (
+          <TextInput
+            style={styles.input}
+            value={value}
+            onChangeText={(val) => handleChange(field, val)}
+            onBlur={handleFinishEditing}
+            autoFocus
+            secureTextEntry={isPassword && !showPassword}
+          />
+        ) : (
+          <View style={styles.valueContainer}>
+            <Text style={styles.value}>
+              {isPassword && !showPassword ? '••••••••' : value || '-'}
+            </Text>
+
+            <View style={styles.iconsContainer}>
+              {isPassword && (
+                <TouchableOpacity 
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.iconButton}
+                >
+                  <Icon
+                    name={showPassword ? 'eye-slash' : 'eye'}
+                    size={18}
+                    color="#6b7280"
+                  />
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity 
+                onPress={() => handleEditField(field)}
+                style={styles.iconButton}
+              >
+                <Icon name="edit" size={18} color="#6b7280" />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </View>
+    </View>
+  );
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Foto de perfil */}
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <View style={styles.profileSection}>
-        <Image
-          source={{ uri: 'https://i.pinimg.com/736x/7f/9e/f5/7f9ef552cb071c696e932222260af318.jpg' }} // Aquí colocas la URL de la foto de perfil
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>{name}</Text>
-      </View>
-
-      {/* Email */}
-      <View style={styles.infoSection}>
-        <Text style={styles.label}>Correo:</Text>
-        {isEditingEmail ? (
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
+        <View style={styles.profileImageContainer}>
+          <Image
+            source={{ uri: user.profilePhoto || 'https://via.placeholder.com/150' }}
+            style={styles.profileImage}
           />
-        ) : (
-          <Text style={styles.value}>{email}</Text>
-        )}
-        <TouchableOpacity
-          onPress={() => setIsEditingEmail(!isEditingEmail)}
-          style={styles.editButton}
-        >
-          <Icon name="pencil" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Contraseña */}
-      <View style={styles.infoSection}>
-        <Text style={styles.label}>Contraseña:</Text>
-        <Text style={styles.value}>
-          {showPassword ? password : '********'}
-        </Text>
-        <TouchableOpacity
-          onPress={() => setShowPassword(!showPassword)}
-          style={styles.eyeButton}
-        >
-          <Icon name={showPassword ? 'eye-slash' : 'eye'} size={20} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Nombre de usuario */}
-      <View style={styles.infoSection}>
-        <Text style={styles.label}>Nombre de usuario:</Text>
-        {isEditingName ? (
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-          />
-        ) : (
-          <Text style={styles.value}>{name}</Text>
-        )}
-        <TouchableOpacity
-          onPress={() => setIsEditingName(!isEditingName)}
-          style={styles.editButton}
-        >
-          <Icon name="pencil" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Número de teléfono */}
-      <View style={styles.infoSection}>
-        <Text style={styles.label}>Teléfono:</Text>
-        {isEditingPhone ? (
-          <TextInput
-            style={styles.input}
-            value={phone}
-            onChangeText={setPhone}
-          />
-        ) : (
-          <Text style={styles.value}>{phone}</Text>
-        )}
-        <TouchableOpacity
-          onPress={() => setIsEditingPhone(!isEditingPhone)}
-          style={styles.editButton}
-        >
-          <Icon name="pencil" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Dirección */}
-      <View style={styles.infoSection}>
-        <Text style={styles.label}>Dirección:</Text>
-        <Text style={styles.value}>{address}</Text>
-      </View>
-
-      {/* Botón del carrito de compras */}
-      <TouchableOpacity
-        style={styles.cartButton}
-        onPress={() => setShowCart(true)}
-      >
-        <Icon name="shopping-cart" size={20} color="white" />
-        <Text style={styles.cartButtonText}>Ver carrito</Text>
-      </TouchableOpacity>
-
-      {/* Modal para el carrito */}
-      <Modal
-        visible={showCart}
-        animationType="slide"
-        onRequestClose={() => setShowCart(false)}
-      >
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Carrito de compras</Text>
-          {/* Aquí colocas los items del carrito */}
-          <Text>Producto 1</Text>
-          <Text>Producto 2</Text>
-          <TouchableOpacity
-            style={styles.closeModalButton}
-            onPress={() => setShowCart(false)}
-          >
-            <Text style={styles.closeModalText}>Cerrar</Text>
+          <TouchableOpacity style={styles.editPhotoButton}>
+            <Icon name="camera" size={16} color="white" />
           </TouchableOpacity>
         </View>
-      </Modal>
+        <Text style={styles.name}>{editableUser.username}</Text>
+      </View>
 
-      {/* Botón de cerrar sesión */}
-      <TouchableOpacity style={styles.logoutButton}>
+      <View style={styles.card}>
+        <EditableField label="Correo electrónico" field="email" value={editableUser.email || ''} />
+        <View style={styles.divider} />
+        <EditableField label="Contraseña" field="password" value={editableUser.password || ''} isPassword />
+        <View style={styles.divider} />
+        <EditableField label="Nombre de usuario" field="username" value={editableUser.username || ''} />
+        <View style={styles.divider} />
+        <EditableField label="Teléfono" field="phone" value={editableUser.phone || ''} />
+        <View style={styles.divider} />
+        <EditableField label="Dirección" field="address" value={editableUser.address || ''} />
+      </View>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
         <Text style={styles.logoutText}>Cerrar sesión</Text>
+        <Icon name="sign-out" size={18} color="white" style={styles.logoutIcon} />
       </TouchableOpacity>
     </ScrollView>
   );
@@ -159,88 +149,127 @@ export default function User() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: '#f8fafc',
+    paddingTop: 20,
+  },
+  scrollContent: {
+    paddingBottom: 40,
   },
   profileSection: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 24,
+    marginBottom: 16,
+  },
+  profileImageContainer: {
+    position: 'relative',
+    marginBottom: 16,
   },
   profileImage: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    marginBottom: 10,
+    borderWidth: 3,
+    borderColor: '#e2e8f0',
+  },
+  editPhotoButton: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#3b82f6',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
   },
   name: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    marginHorizontal: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   infoSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 10,
+    paddingVertical: 12,
   },
   label: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 6,
+    fontWeight: '500',
+  },
+  fieldContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  valueContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     flex: 1,
-    fontWeight: 'bold',
   },
   value: {
-    flex: 2,
     fontSize: 16,
+    color: '#1e293b',
+    fontWeight: '500',
+    flex: 1,
   },
   input: {
-    flex: 2,
+    fontSize: 16,
+    color: '#1e293b',
+    fontWeight: '500',
     borderBottomWidth: 1,
-    borderColor: 'gray',
-    fontSize: 16,
-  },
-  eyeButton: {
-    marginLeft: 10,
-  },
-  editButton: {
-    marginLeft: 10,
-  },
-  cartButton: {
-    flexDirection: 'row',
-    backgroundColor: '#28a745',
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 20,
-    borderRadius: 5,
-    justifyContent: 'center',
-  },
-  cartButtonText: {
-    color: 'white',
-    marginLeft: 10,
-    fontSize: 16,
-  },
-  modalContainer: {
+    borderColor: '#e2e8f0',
+    paddingVertical: 6,
     flex: 1,
-    padding: 20,
   },
-  modalTitle: {
-    fontSize: 22,
-    marginBottom: 20,
+  iconsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 12,
   },
-  closeModalButton: {
-    marginTop: 20,
-    backgroundColor: '#dc3545',
-    padding: 10,
-    borderRadius: 5,
+  iconButton: {
+    padding: 6,
+    marginLeft: 4,
   },
-  closeModalText: {
-    color: 'white',
-    textAlign: 'center',
+  divider: {
+    height: 1,
+    backgroundColor: '#f1f5f9',
+    marginVertical: 4,
   },
   logoutButton: {
-    marginTop: 40,
-    backgroundColor: '#dc3545',
-    padding: 15,
-    borderRadius: 5,
+    backgroundColor: '#ef4444',
+    padding: 14,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 20,
+    marginTop: 8,
   },
   logoutText: {
     color: 'white',
-    textAlign: 'center',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  logoutIcon: {
+    marginLeft: 10,
   },
 });
