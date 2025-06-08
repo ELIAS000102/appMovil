@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <>
       {/* Barra de estado en morado oscuro */}
-      <StatusBar backgroundColor="#5E2A84" barStyle="light-content" />
+      <StatusBar backgroundColor="#2A5784FF" barStyle="light-content" />
 
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>

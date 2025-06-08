@@ -15,7 +15,7 @@ export default function ButtonLogin() {
       >
         <View style={styles.buttonContent}>
           <Icon name="sign-in" size={18} color="white" style={styles.icon} />
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
+          <Text style={styles.buttonText}>Login</Text>
         </View>
       </TouchableOpacity>
       
@@ -28,14 +28,14 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#3b82f6',
     paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: 2,
     borderRadius: 8,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    minWidth: 120,
+    minWidth: 100,
   },
   buttonContent: {
     flexDirection: 'row',

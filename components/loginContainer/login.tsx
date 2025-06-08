@@ -56,7 +56,7 @@ const Login: React.FC<LoginProps> = ({ onSwitch, onClose }) => {
           style={{
             position: "absolute",
             right: 10,
-            top: 12,
+            top: 7,
             padding: 5,
           }}
         >

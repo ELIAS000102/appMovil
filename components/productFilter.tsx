@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   searchButton: {
     width: 40,
     height: 40,
-    backgroundColor: "#2E7D32", // verde oscuro
+    backgroundColor: "#2A5784FF", // verde oscuro
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: 40,
-    width: "80%",
-    backgroundColor: "#CBEDF2FF", // verde claro
+    width: "85%",
+    backgroundColor: "#CBEDF2FF", // azul claro
     borderRadius: 20,
     paddingHorizontal: 12,
     fontSize: 16,

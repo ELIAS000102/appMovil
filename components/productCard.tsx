@@ -38,14 +38,11 @@ export default function ProductCard({
           {/* Stock indicator */}
           {stock <= 5 && stock > 0 && (
             <View style={styles.stockBadge}>
-              <Text style={styles.stockText}>Solo {stock} left</Text>
+              <Text style={styles.stockText}>Quedan solo {stock}</Text>
             </View>
           )}
           
-          {/* Favorite button */}
-          <TouchableOpacity style={styles.favoriteButton}>
-            <Ionicons name="heart-outline" size={20} color="#fff" />
-          </TouchableOpacity>
+
         </View>
 
         <View style={styles.infoContainer}>
