@@ -1,14 +1,16 @@
-import { View, Text, Image, StyleSheet, Animated, Easing } from 'react-native';
-import React, { useEffect, useRef } from 'react';
-import { useRouter } from 'expo-router';
+import { View, Text, Image, StyleSheet, Animated, Easing } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "expo-router";
+import themeManager from "../Theme/ThemeManager"; // ✅ Asegúrate que este es el path correcto
 
 export default function LoadScreen() {
+  const [theme, setTheme] = useState(themeManager.getTheme());
   const router = useRouter();
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const progressAnim = useRef(new Animated.Value(0)).current;
 
-  // Animación de puntos
   const dots = [
     useRef(new Animated.Value(0)).current,
     useRef(new Animated.Value(0)).current,
@@ -16,11 +18,28 @@ export default function LoadScreen() {
   ];
 
   useEffect(() => {
+    const initTheme = async () => {
+      await themeManager.init(); // ✅ Inicializa correctamente
+      setTheme(themeManager.getTheme());
+    };
+
+    initTheme();
+
+    const handleThemeChange = () => {
+      setTheme(themeManager.getTheme());
+    };
+
+    themeManager.subscribe(handleThemeChange);
+    return () => {
+      themeManager.unsubscribe(handleThemeChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
-      router.replace('/(tabs)/home');
+      router.replace("/(tabs)/home");
     }, 4000);
 
-    // Animación de entrada
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -41,7 +60,6 @@ export default function LoadScreen() {
       }),
     ]).start();
 
-    // Animación de puntos
     dots.forEach((dot, index) => {
       Animated.loop(
         Animated.sequence([
@@ -64,33 +82,45 @@ export default function LoadScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-        {/* Logo con sombra */}
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Animated.View
+        style={[
+          styles.content,
+          { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
+        ]}
+      >
         <View style={styles.logoContainer}>
           <Image
-            source={require('../assets/recursos/0e67e2c0e385c0a8cc4741968ca9a9cb.jpg')}
+            source={
+              theme.mode === "dark"
+                ? require("../assets/recursos/logo Z oscuro.jpg")
+                : require("../assets/recursos/logo Z claro.jpg")
+            }
             style={styles.logo}
             resizeMode="contain"
           />
         </View>
 
-        {/* Texto de carga con animación de puntos */}
         <View style={styles.loadingContainer}>
-          <Text style={styles.text}>Cargando</Text>
+          <Text style={[styles.text, { color: theme.primary }]}>Cargando</Text>
           <View style={styles.dotsContainer}>
             {dots.map((dot, index) => (
-              <Animated.Text 
-                key={index} 
+              <Animated.Text
+                key={index}
                 style={[
                   styles.dot,
-                  { 
+                  {
                     opacity: dot,
-                    transform: [{ translateY: dot.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0, -8]
-                    }) }] 
-                  }
+                    transform: [
+                      {
+                        translateY: dot.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, -8],
+                        }),
+                      },
+                    ],
+                    color: theme.primary,
+                  },
                 ]}
               >
                 .
@@ -99,17 +129,22 @@ export default function LoadScreen() {
           </View>
         </View>
 
-        {/* Barra de progreso */}
-        <View style={styles.progressBarContainer}>
-          <Animated.View 
+        <View
+          style={[
+            styles.progressBarContainer,
+            { backgroundColor: theme.surface },
+          ]}
+        >
+          <Animated.View
             style={[
               styles.progressBar,
               {
                 width: progressAnim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['0%', '100%'],
+                  outputRange: ["0%", "100%"],
                 }),
-              }
+                backgroundColor: theme.primary,
+              },
             ]}
           />
         </View>
@@ -121,57 +156,52 @@ export default function LoadScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   content: {
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   logoContainer: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
     marginBottom: 40,
   },
   logo: {
-    width: 150,
-    height: 150,
+    width: 300,
+    height: 300,
     borderRadius: 20,
   },
   loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 30,
   },
   text: {
     fontSize: 22,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
   },
   dotsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginLeft: 5,
   },
   dot: {
     fontSize: 28,
-    color: '#4a6da7',
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   progressBarContainer: {
     height: 4,
-    width: '80%',
-    backgroundColor: '#e9ecef',
+    width: "80%",
     borderRadius: 2,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progressBar: {
-    height: '100%',
-    backgroundColor: '#4a6da7',
+    height: "100%",
     borderRadius: 2,
   },
 });

@@ -14,7 +14,7 @@ export const products: Product[] = [
     imageUrl: "https://media.falabella.com/falabellaPE/119680686_01/public",
     categories: ["Electrónica", "Tecnología Móvil"],
     description: "El Samsung Galaxy A34 ofrece una experiencia móvil excepcional con su pantalla Super AMOLED de 6.6 pulgadas...",
-    stock: 200,
+    stock: 0,
   },
   {
     name: "Sofá de 3 plazas gris",
