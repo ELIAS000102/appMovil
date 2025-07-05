@@ -21,10 +21,10 @@ export const users: User[] = [
     status: "admin"
   },
   {
-    username: "maria.garcia",
-    email: "maria.garcia@hotmail.com",
-    password: "M4ri@2025!",
-    profilePhoto: "https://randomuser.me/api/portraits/women/5.jpg",
+    username: "ARTEAGA02",
+    email: "arteaga@hotmail.com",
+    password: "autonoma2025",
+    profilePhoto: "https://larepublica.cronosmedia.glr.pe/original/2022/12/10/6393fcccef55da78636b87f6.jpg",
     phone: "+34 612345678",
     address: "Calle Alcalá 45, Madrid, España",
     status: "user"

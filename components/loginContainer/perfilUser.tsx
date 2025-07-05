@@ -1,11 +1,16 @@
 import React, { useState } from "react";
-import { View, Image, TouchableOpacity, StyleSheet, Text, Pressable, Alert } from "react-native";
+import { View, Image, TouchableOpacity, Text, Pressable, Alert, StyleSheet,useColorScheme } from "react-native";
 import { useAuth } from "../../authentication/useAuth";
 import { logout } from "../../authentication/authService";
+import { lightTheme, darkTheme } from "../../Theme/colors"; // Importa tus temas
+
 
 const UserLogin = ({ onViewCart }: { onViewCart?: () => void }) => {
   const { user } = useAuth();
   const [menuVisible, setMenuVisible] = useState(false);
+
+  const colorScheme = useColorScheme();
+    const theme = colorScheme === "light" ? darkTheme : lightTheme;
 
   if (!user) return null;
 
@@ -32,11 +37,11 @@ const UserLogin = ({ onViewCart }: { onViewCart?: () => void }) => {
     <View style={styles.container}>
       <Image
         source={{ uri: user.profilePhoto }}
-        style={styles.profileImage}
+        style={[styles.profileImage,{ borderColor: theme.primary }]}
       />
 
       <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
-        <Text style={styles.menuIcon}>☰</Text>
+        <Text style={[styles.menuIcon,{color: theme.primary}]}>☰</Text>
       </TouchableOpacity>
 
       {menuVisible && (
@@ -53,13 +58,17 @@ const UserLogin = ({ onViewCart }: { onViewCart?: () => void }) => {
   );
 };
 
+
+export default UserLogin;
+
 const styles = StyleSheet.create({
-  container: {
+   container: {
     flexDirection: "row",
     alignItems: "center",
     position: "relative",
   },
   profileImage: {
+    borderWidth: 3,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -84,6 +93,4 @@ const styles = StyleSheet.create({
   menuItem: {
     paddingVertical: 8,
   },
-});
-
-export default UserLogin;
+})

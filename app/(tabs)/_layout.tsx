@@ -1,27 +1,36 @@
 import { Tabs } from "expo-router";
-import React from "react";
-import { StyleSheet, View, Platform } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Dimensions } from "react-native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Feather from "@expo/vector-icons/Feather";
-import { useTheme } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import themeManager from "@/Theme/ThemeManager"; // Asegúrate que el path sea correcto
 
 export default function TabLayout() {
-  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+
+  const [mode, setMode] = useState<"light" | "dark">(themeManager.getMode());
+
+  useEffect(() => {
+    themeManager.subscribe(setMode);
+    return () => {
+      themeManager.unsubscribe(setMode);
+    };
+  }, []);
+
+  const theme = themeManager.getTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.text,
-        tabBarStyle: [
-          styles.tabBar,
-          {
-            height: 60 + insets.bottom,
-            paddingBottom: 10 + insets.bottom / 2,
-          }
-        ],
+        tabBarActiveTintColor: theme.textPrimary,
+        tabBarInactiveTintColor: theme.onPrimary,
+        tabBarStyle: {
+          ...styles.tabBar,
+          backgroundColor: theme.primary,
+          height: 60 + insets.bottom,
+          paddingBottom: 10 + insets.bottom / 2,
+        },
         tabBarLabelStyle: styles.label,
         tabBarItemStyle: styles.tabItem,
         tabBarHideOnKeyboard: true,
@@ -33,12 +42,16 @@ export default function TabLayout() {
           title: "Inicio",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.iconContainerFocused : styles.iconContainer}>
-              <FontAwesome 
-                name="home" 
-                color={color} 
-                size={20} // Tamaño reducido para mejor proporción
-                style={focused ? styles.iconFocused : null}
+            <View
+              style={
+                focused ? styles.iconContainerFocused : styles.iconContainer
+              }
+            >
+              <FontAwesome
+                name="home"
+                color={color}
+                size={20}
+                style={focused ? styles.iconFocused : undefined}
               />
             </View>
           ),
@@ -50,12 +63,16 @@ export default function TabLayout() {
           title: "Perfil",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.iconContainerFocused : styles.iconContainer}>
-              <FontAwesome 
-                name="user" 
-                color={color} 
-                size={20} // Tamaño reducido para mejor proporción
-                style={focused ? styles.iconFocused : null}
+            <View
+              style={
+                focused ? styles.iconContainerFocused : styles.iconContainer
+              }
+            >
+              <FontAwesome
+                name="user"
+                color={color}
+                size={20}
+                style={focused ? styles.iconFocused : undefined}
               />
             </View>
           ),
@@ -67,12 +84,16 @@ export default function TabLayout() {
           title: "Ajustes",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
-            <View style={focused ? styles.iconContainerFocused : styles.iconContainer}>
-              <Feather 
-                name="settings" 
-                color={color} 
-                size={20} // Tamaño reducido para mejor proporción
-                style={focused ? styles.iconFocused : null}
+            <View
+              style={
+                focused ? styles.iconContainerFocused : styles.iconContainer
+              }
+            >
+              <Feather
+                name="settings"
+                color={color}
+                size={20}
+                style={focused ? styles.iconFocused : undefined}
               />
             </View>
           ),
@@ -82,40 +103,41 @@ export default function TabLayout() {
   );
 }
 
+const { width } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   tabBar: {
-    position: 'absolute',
+    position: "absolute",
     borderTopWidth: 0,
     elevation: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    backgroundColor: '#ffffff',
   },
   label: {
     fontSize: 12,
-    fontWeight: '500',
-    marginBottom: 4, // Ajuste para mejor alineación
+    fontWeight: "500",
+    marginBottom: 4,
   },
   tabItem: {
     paddingVertical: 6,
-    height: 50, // Altura fija para los items
+    height: 50,
   },
   iconContainer: {
-    padding: 4, // Reducido para mejor proporción
-    borderRadius: 12, // Reducido para mejor proporción
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 4,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
   iconContainerFocused: {
-    padding: 4, // Reducido para mejor proporción
-    borderRadius: 12, // Reducido para mejor proporción
-    backgroundColor: 'rgba(0, 122, 255, 0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 4,
+    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   iconFocused: {
-    transform: [{ scale: 1.05 }], // Efecto sutil de escala
+    transform: [{ scale: 1.05 }],
   },
 });

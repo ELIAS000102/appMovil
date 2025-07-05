@@ -1,30 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   View,
   Text,
-  StyleSheet,
   SafeAreaView,
   Pressable,
-  Modal,
-  TextInput,
+  StyleSheet,
 } from "react-native";
-import ProductCard from "../components/productCard";
+
+import ProductCard from "../components/ProductCard/productCard";
 import { products } from "../database/products";
-import SearchBar from "../components/productFilter";
+import SearchBar from "../components/productSearch";
 import ButtonLogin from "@/components/buttonLogin";
 import UserLogin from "@/components/loginContainer/perfilUser";
-import { styles as globalStyles } from "../Styles/globalStyles";
 import { useAuth } from "../authentication/useAuth";
 
+import CategoryFilterModal from "../components/CategoryFilterModal";
+import PriceFilterModal from "../components/PriceFilterModal";
+import themeManager from "@/Theme/ThemeManager";
+import Cart from "../screens/Cart";
+
 export default function Galeria() {
+  const [mode, setMode] = useState<"light" | "dark">(themeManager.getMode());
+
+  useEffect(() => {
+    themeManager.subscribe(setMode);
+    return () => {
+      themeManager.unsubscribe(setMode);
+    };
+  }, []);
+
+  const theme = themeManager.getTheme();
+
+  const [showCartModal, setShowCartModal] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState("");
   const { user } = useAuth();
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [priceModalVisible, setPriceModalVisible] = useState(false);
-  const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [selectedMainCategory, setSelectedMainCategory] = useState<
+    string | null
+  >(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
+    null
+  );
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
@@ -66,38 +86,69 @@ export default function Galeria() {
     });
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.leftContainer}>
+    <SafeAreaView
+      style={[styles.safeAreaGalery, { backgroundColor: theme.background }]}
+    >
+      <View
+        style={[styles.containerGalery, { backgroundColor: theme.background }]}
+      >
+        <View style={styles.headerGalery}>
+          <View style={styles.leftContainerGalery}>
             <SearchBar onSearch={setSearchTerm} />
           </View>
-          <View style={styles.rightContainer}>
-            {user ? <UserLogin /> : <ButtonLogin />}
+          <View style={styles.rightContainerGalery}>
+            {user ? (
+              <UserLogin onViewCart={() => setShowCartModal(true)} /> // ✅ PASADO AQUÍ
+              
+            ) : (
+              <ButtonLogin />
+            )}
+            <Cart visible={showCartModal} onClose={() => setShowCartModal(false)} />
+
           </View>
         </View>
 
-        <View style={styles.filterButtonsContainer}>
+        <View style={styles.filterButtonsContainerGalery}>
           <Pressable
             onPress={() => setMenuVisible(true)}
-            style={styles.filterButton}
+            style={[
+              styles.filterButtonGalery,
+              { backgroundColor: theme.primary },
+            ]}
           >
-            <Text style={styles.filterButtonText}>Categoría</Text>
+            <Text
+              style={[
+                styles.filterButtonTextGalery,
+                { color: theme.textPrimary },
+              ]}
+            >
+              Categoría
+            </Text>
           </Pressable>
           <Pressable
             onPress={() => setPriceModalVisible(true)}
-            style={styles.filterButton}
+            style={[
+              styles.filterButtonGalery,
+              { backgroundColor: theme.primary },
+            ]}
           >
-            <Text style={styles.filterButtonText}>Precio</Text>
+            <Text
+              style={[
+                styles.filterButtonTextGalery,
+                { color: theme.textPrimary },
+              ]}
+            >
+              Precio
+            </Text>
           </Pressable>
         </View>
 
         <ScrollView
-          contentContainerStyle={styles.productsContainer}
+          contentContainerStyle={styles.productsContainerGalery}
           showsVerticalScrollIndicator={true}
         >
           {filteredProducts.length > 0 ? (
-            <View style={styles.productsGrid}>
+            <View style={styles.productsGridGalery}>
               {filteredProducts.map((product, index) => (
                 <ProductCard
                   key={`${product.name}-${index}`}
@@ -106,14 +157,23 @@ export default function Galeria() {
                   imageUrl={product.imageUrl}
                   description={product.description}
                   stock={product.stock}
-                  onPress={() => console.log(`${product.name} seleccionado`)}
+                  categories={product.categories}
                 />
               ))}
             </View>
           ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No se encontraron productos</Text>
-              <Text style={styles.emptySubtext}>
+            <View style={styles.emptyStateGalery}>
+              <Text
+                style={[styles.emptyTextGalery, { color: theme.textPrimary }]}
+              >
+                No se encontraron productos
+              </Text>
+              <Text
+                style={[
+                  styles.emptySubtextGalery,
+                  { color: theme.textSecondary },
+                ]}
+              >
                 Intenta con otros términos de búsqueda o ajusta los filtros
               </Text>
             </View>
@@ -121,242 +181,75 @@ export default function Galeria() {
         </ScrollView>
       </View>
 
-      {/* Modal de Categorías */}
-      <Modal visible={menuVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Pressable
-                onPress={() => setMenuVisible(false)}
-                style={styles.closeButton}
-              >
-                <Text style={styles.closeButtonText}>✕</Text>
-              </Pressable>
-            </View>
-            <ScrollView>
-              <View style={styles.modalContent}>
-                <View style={styles.categoryColumn}>
-                  <Text style={styles.columnTitle}>Categorías principales</Text>
-                  {allMainCategories.map((main) => (
-                    <Pressable
-                      key={main}
-                      onPress={() => {
-                        setSelectedMainCategory(main);
-                        setSelectedSubCategory(null);
-                      }}
-                      style={[
-                        styles.categoryItem,
-                        selectedMainCategory === main && styles.selectedItem,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.categoryText,
-                          selectedMainCategory === main && styles.selectedText,
-                        ]}
-                      >
-                        {main}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
-                <View style={styles.categoryColumn}>
-                  <Text style={styles.columnTitle}>Subcategorías</Text>
-                  {subCategories.length > 0 ? (
-                    subCategories.map((sub) => (
-                      <Pressable
-                        key={sub}
-                        onPress={() => {
-                          setSelectedSubCategory(sub);
-                          setMenuVisible(false);
-                        }}
-                        style={[
-                          styles.categoryItem,
-                          selectedSubCategory === sub && styles.selectedItem,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.categoryText,
-                            selectedSubCategory === sub && styles.selectedText,
-                          ]}
-                        >
-                          {sub}
-                        </Text>
-                      </Pressable>
-                    ))
-                  ) : (
-                    <Text style={styles.noSubText}>
-                      Selecciona una categoría principal
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </ScrollView>
-            <Pressable
-              onPress={() => {
-                setSelectedMainCategory(null);
-                setSelectedSubCategory(null);
-                setMenuVisible(false);
-              }}
-            >
-              <Text style={styles.clearFilters}>Limpiar filtros</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+      <CategoryFilterModal
+        visible={menuVisible}
+        onClose={() => setMenuVisible(false)}
+        allMainCategories={allMainCategories}
+        selectedMainCategory={selectedMainCategory}
+        setSelectedMainCategory={setSelectedMainCategory}
+        selectedSubCategory={selectedSubCategory}
+        setSelectedSubCategory={setSelectedSubCategory}
+        subCategories={subCategories}
+      />
 
-      {/* Modal de Precio */}
-      <Modal visible={priceModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalHeader}>
-              <Pressable
-                onPress={() => setPriceModalVisible(false)}
-                style={styles.closeButton}
-              >
-                <Text style={styles.closeButtonText}>✕</Text>
-              </Pressable>
-            </View>
-            <ScrollView contentContainerStyle={styles.priceFilterContent}>
-              <Text style={styles.columnTitle}>Filtrar por precio</Text>
-
-              <Text style={styles.priceLabel}>Precio mínimo:</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                placeholder="Ej. 10"
-                value={minPrice}
-                onChangeText={setMinPrice}
-              />
-
-              <Text style={styles.priceLabel}>Precio máximo:</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                placeholder="Ej. 100"
-                value={maxPrice}
-                onChangeText={setMaxPrice}
-              />
-
-              <Pressable
-                onPress={() => setPriceModalVisible(false)}
-                style={styles.applyButton}
-              >
-                <Text style={styles.applyButtonText}>Aplicar</Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => {
-                  setMinPrice("");
-                  setMaxPrice("");
-                  setPriceModalVisible(false);
-                }}
-              >
-                <Text style={styles.clearFilters}>Limpiar filtros</Text>
-              </Pressable>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+      <PriceFilterModal
+        visible={priceModalVisible}
+        onClose={() => setPriceModalVisible(false)}
+        minPrice={minPrice}
+        setMinPrice={setMinPrice}
+        maxPrice={maxPrice}
+        setMaxPrice={setMaxPrice}
+      />
     </SafeAreaView>
+    
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#ffffff" },
-  container: {
+  safeAreaGalery: { flex: 1 },
+  containerGalery: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
-    backgroundColor: "#ffffff",
   },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
-  leftContainer: { flex: 1 },
-  rightContainer: { justifyContent: "flex-end" },
-  filterButtonsContainer: { flexDirection: "row", gap: 12, marginBottom: 16 },
-  filterButton: {
+  headerGalery: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  leftContainerGalery: { flex: 1 },
+  rightContainerGalery: { justifyContent: "flex-end" },
+  filterButtonsContainerGalery: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 16,
+  },
+  filterButtonGalery: {
     paddingVertical: 8,
     paddingHorizontal: 14,
-    backgroundColor: "#f2f2f2",
     borderRadius: 10,
   },
-  filterButtonText: { fontSize: 14, color: "#333" },
-  productsContainer: { paddingBottom: 180 },
-  productsGrid: {
+  filterButtonTextGalery: { fontSize: 14 },
+  productsContainerGalery: { paddingBottom: 180 },
+  productsGridGalery: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  emptyState: {
+  emptyStateGalery: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 100,
   },
-  emptyText: {
+  emptyTextGalery: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#333333",
     marginBottom: 8,
     textAlign: "center",
   },
-  emptySubtext: { fontSize: 14, color: "#666666", textAlign: "center" },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 16,
-    maxHeight: "80%",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginBottom: 8,
-  },
-  closeButton: { padding: 6 },
-  closeButtonText: { fontSize: 20, color: "#444" },
-  modalContent: { flexDirection: "row", gap: 12 },
-  categoryColumn: { flex: 1 },
-  columnTitle: { fontWeight: "bold", fontSize: 16, marginBottom: 10 },
-  categoryItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 6,
-    backgroundColor: "#eee",
-    marginBottom: 6,
-  },
-  selectedItem: { backgroundColor: "#cde" },
-  categoryText: { fontSize: 14 },
-  selectedText: { fontWeight: "bold" },
-  noSubText: { fontStyle: "italic", color: "#666" },
-  clearFilters: {
-    marginTop: 16,
+  emptySubtextGalery: {
+    fontSize: 14,
     textAlign: "center",
-    color: "#007bff",
-    fontWeight: "500",
   },
-  priceFilterContent: { padding: 10 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 16,
-  },
-  priceLabel: { fontSize: 14, fontWeight: "500", marginBottom: 4 },
-  applyButton: {
-    backgroundColor: "#007bff",
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  applyButtonText: { color: "#fff", fontSize: 16 },
 });
