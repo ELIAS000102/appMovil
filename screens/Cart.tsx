@@ -15,8 +15,9 @@ export type CartItem = {
   imageUrl: string;
   description: string;
   stock: number;
-  categories: string[];
   quantity: number;
+  categoriePrimary: string;
+  categorieSecondary: string;
 };
 
 let cartItems: CartItem[] = [];
@@ -89,6 +90,9 @@ export default function Cart({ visible, onClose }: Props) {
               <View style={{ flex: 1 }}>
                 <Text style={styles.name}>{item.name}</Text>
                 <Text style={styles.price}>S/. {item.price.toFixed(2)}</Text>
+                <Text style={styles.category}>
+                  {item.categoriePrimary} / {item.categorieSecondary}
+                </Text>
               </View>
               <View style={styles.quantity}>
                 <TouchableOpacity onPress={() => decrease(item.name)}>
@@ -127,6 +131,7 @@ const styles = StyleSheet.create({
   },
   name: { fontSize: 16, fontWeight: "500" },
   price: { fontSize: 14, color: "#666" },
+  category: { fontSize: 12, color: "#999" },
   quantity: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
   quantityText: { marginHorizontal: 8, fontSize: 16 },
   total: { fontSize: 18, fontWeight: "bold", marginTop: 20 },

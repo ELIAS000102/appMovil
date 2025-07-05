@@ -1,3 +1,4 @@
+// ProductDetails.tsx
 import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
@@ -24,7 +25,8 @@ type ProductDetailsProps = {
   imageUrl: string;
   description: string;
   stock: number;
-  categories: string[];
+  categoriePrimary: string;
+  categorieSecondary: string;
   allProducts: Product[];
 };
 
@@ -36,7 +38,8 @@ export default function ProductDetails({
   imageUrl,
   description,
   stock,
-  categories,
+  categoriePrimary,
+  categorieSecondary,
   allProducts,
 }: ProductDetailsProps) {
   const [showAddToCart, setShowAddToCart] = useState(false);
@@ -68,7 +71,8 @@ export default function ProductDetails({
       imageUrl,
       description,
       stock,
-      categories,
+      categoriePrimary,
+      categorieSecondary,
       quantity,
     });
     setShowAddToCart(true);
@@ -83,12 +87,14 @@ export default function ProductDetails({
   };
 
   const relatedProducts = useMemo(() => {
-    return allProducts.filter(
-      (product) =>
-        product.name !== name &&
-        product.categories.some((cat) => categories.includes(cat))
-    );
-  }, [allProducts, name, categories]);
+    return allProducts.filter((product) => {
+      if (product.name === name) return false;
+      const relatedCats = [categoriePrimary, categorieSecondary];
+      return [product.categoriePrimary, product.categorieSecondary].some((cat) =>
+        relatedCats.includes(cat)
+      );
+    });
+  }, [allProducts, name, categoriePrimary, categorieSecondary]);
 
   return (
     <>
@@ -99,7 +105,9 @@ export default function ProductDetails({
         animationOut="slideOutDown"
         style={styles.modalProductDetails}
       >
-        <View style={[styles.containerProductDetails, { backgroundColor: theme.background }]}>
+        <View
+          style={[styles.containerProductDetails, { backgroundColor: theme.background }]}
+        >
           <View style={styles.header}>
             <TouchableOpacity onPress={onClose} style={styles.closeButtonProductDetails}>
               <Ionicons name="close" size={24} color={theme.primary} />
@@ -145,7 +153,9 @@ export default function ProductDetails({
 
             {relatedProducts.length > 0 && (
               <View style={styles.relatedContainer}>
-                <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>Productos relacionados</Text>
+                <Text style={[styles.sectionTitle, { color: theme.textSecondary }]}>
+                  Productos relacionados
+                </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {relatedProducts.map((product) => (
                     <View key={product.name} style={{ marginRight: 10 }}>
@@ -230,7 +240,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     padding: 8,
-    
   },
   quantityText: { fontSize: 18, fontWeight: "500", marginHorizontal: 16 },
   addToCartButton: {

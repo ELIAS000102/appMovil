@@ -1,9 +1,8 @@
-// components/ProductCardWithModal.tsx
+// components/ProductCard.tsx
 import React from "react";
 import ProductCardBase from "./productCardBase";
 import ProductDetails from "../productDetails";
-import { products } from "@/database/products";
-import { Dimensions, StyleSheet } from "react-native";
+import { Product } from "@/database/products";
 
 type ProductCardProps = {
   name: string;
@@ -11,7 +10,9 @@ type ProductCardProps = {
   imageUrl: string;
   description?: string;
   stock?: number;
-  categories?: string[];
+  categoriePrimary: string;
+  categorieSecondary: string;
+  allProducts?: Product[]; // permite pasar productos desde props o usar fallback
 };
 
 export default function ProductCard({
@@ -20,7 +21,9 @@ export default function ProductCard({
   imageUrl,
   description = "No description available",
   stock = 0,
-  categories = [],
+  categoriePrimary,
+  categorieSecondary,
+  allProducts = [], // por defecto, vacío si no se pasa nada
 }: ProductCardProps) {
   const [visible, setVisible] = React.useState(false);
 
@@ -41,10 +44,10 @@ export default function ProductCard({
         imageUrl={imageUrl}
         description={description}
         stock={stock}
-        categories={categories}
-        allProducts={products}
+        categoriePrimary={categoriePrimary}
+        categorieSecondary={categorieSecondary}
+        allProducts={allProducts}
       />
     </>
   );
 }
-

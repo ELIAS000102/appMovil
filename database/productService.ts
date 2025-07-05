@@ -1,20 +1,25 @@
-import axios from 'axios';
-import { Product } from '../database/products';
+// database/productService.ts
+import { Product } from "./products";
 
-const API_URL = 'https://shopapp-backend-aeh8gsbegxdva5bc.brazilsouth-01.azurewebsites.net/productos';
-
-export const fetchProducts = async (): Promise<Product[]> => {
+export async function fetchProducts(): Promise<Product[]> {
   try {
-    const response = await axios.get(API_URL);
+    const response = await fetch("https://shopapp-backend-aeh8gsbegxdva5bc.brazilsouth-01.azurewebsites.net/productos");
+    const data = await response.json();
 
-    const productos = response.data.map((p: any) => ({
-      ...p,
-      categories: typeof p.categories === "string" ? JSON.parse(p.categories) : p.categories
+    // Mapea las claves del backend al formato esperado
+    const mappedProducts: Product[] = data.map((item: any) => ({
+      name: item.Name,
+      price: item.Price,
+      imageUrl: item.ImageUrl,
+      description: item.Description,
+      stock: item.Stock,
+      categoriePrimary: item.CategoriePrimary,
+      categorieSecondary: item.CategorieSecondary,
     }));
 
-    return productos;
+    return mappedProducts;
   } catch (error) {
-    console.error('Error al obtener productos:', error);
+    console.error("Error al obtener productos:", error);
     return [];
   }
-};
+}

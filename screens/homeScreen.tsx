@@ -1,27 +1,41 @@
+// screens/Galeria.tsx
 import React, { useEffect, useState } from "react";
 import {
-  ScrollView,
-  View,
-  Text,
-  SafeAreaView,
   Pressable,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
-import ProductCard from "../components/ProductCard/productCard";
-import { products } from "../database/products";
-import SearchBar from "../components/productSearch";
 import ButtonLogin from "@/components/buttonLogin";
 import UserLogin from "@/components/loginContainer/perfilUser";
 import { useAuth } from "../authentication/useAuth";
+import ProductCard from "../components/ProductCard/productCard";
+import SearchBar from "../components/productSearch";
+import { fetchProducts } from "../database/productService";
+import { Product } from "../database/products";
 
+import themeManager from "@/Theme/ThemeManager";
 import CategoryFilterModal from "../components/CategoryFilterModal";
 import PriceFilterModal from "../components/PriceFilterModal";
-import themeManager from "@/Theme/ThemeManager";
 import Cart from "../screens/Cart";
 
 export default function Galeria() {
   const [mode, setMode] = useState<"light" | "dark">(themeManager.getMode());
+  const [products, setProducts] = useState<Product[]>([]);
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [priceModalVisible, setPriceModalVisible] = useState(false);
+  const [selectedMainCategory, setSelectedMainCategory] = useState<string | null>(null);
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
+  const { user } = useAuth();
+  const theme = themeManager.getTheme();
 
   useEffect(() => {
     themeManager.subscribe(setMode);
@@ -30,37 +44,26 @@ export default function Galeria() {
     };
   }, []);
 
-  const theme = themeManager.getTheme();
+  useEffect(() => {
+    fetchProducts().then((data) => {
+      const validProducts = data.filter((p) => p && p.name);
+      setProducts(validProducts);
+    });
+  }, []);
 
-  const [showCartModal, setShowCartModal] = useState(false);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const { user } = useAuth();
-
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [priceModalVisible, setPriceModalVisible] = useState(false);
-  const [selectedMainCategory, setSelectedMainCategory] = useState<
-    string | null
-  >(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<string | null>(
-    null
-  );
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-
-  const normalizeText = (text: string) =>
-    text.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const normalizeText = (text?: string) =>
+    (text ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
   const allMainCategories = Array.from(
-    new Set(products.map((p) => p.categories[0]))
+    new Set(products.map((p) => p.categoriePrimary))
   );
 
   const subCategories = selectedMainCategory
     ? Array.from(
         new Set(
           products
-            .filter((p) => p.categories[0] === selectedMainCategory)
-            .map((p) => p.categories[1])
+            .filter((p) => p.categoriePrimary === selectedMainCategory)
+            .map((p) => p.categorieSecondary)
         )
       )
     : [];
@@ -70,12 +73,9 @@ export default function Galeria() {
       normalizeText(product.name).includes(normalizeText(searchTerm))
     )
     .filter((product) => {
-      if (
-        selectedMainCategory &&
-        product.categories[0] !== selectedMainCategory
-      )
+      if (selectedMainCategory && product.categoriePrimary !== selectedMainCategory)
         return false;
-      if (selectedSubCategory && product.categories[1] !== selectedSubCategory)
+      if (selectedSubCategory && product.categorieSecondary !== selectedSubCategory)
         return false;
       const price = product.price;
       const min = parseFloat(minPrice);
@@ -86,94 +86,63 @@ export default function Galeria() {
     });
 
   return (
-    <SafeAreaView
-      style={[styles.safeAreaGalery, { backgroundColor: theme.background }]}
-    >
-      <View
-        style={[styles.containerGalery, { backgroundColor: theme.background }]}
-      >
+    <SafeAreaView style={[styles.safeAreaGalery, { backgroundColor: theme.background }]}>
+      <View style={[styles.containerGalery, { backgroundColor: theme.background }]}>
         <View style={styles.headerGalery}>
           <View style={styles.leftContainerGalery}>
             <SearchBar onSearch={setSearchTerm} />
           </View>
           <View style={styles.rightContainerGalery}>
             {user ? (
-              <UserLogin onViewCart={() => setShowCartModal(true)} /> // ✅ PASADO AQUÍ
-              
+              <UserLogin onViewCart={() => setShowCartModal(true)} />
             ) : (
               <ButtonLogin />
             )}
             <Cart visible={showCartModal} onClose={() => setShowCartModal(false)} />
-
           </View>
         </View>
 
         <View style={styles.filterButtonsContainerGalery}>
           <Pressable
             onPress={() => setMenuVisible(true)}
-            style={[
-              styles.filterButtonGalery,
-              { backgroundColor: theme.primary },
-            ]}
+            style={[styles.filterButtonGalery, { backgroundColor: theme.primary }]}
           >
-            <Text
-              style={[
-                styles.filterButtonTextGalery,
-                { color: theme.textPrimary },
-              ]}
-            >
+            <Text style={[styles.filterButtonTextGalery, { color: theme.textPrimary }]}>
               Categoría
             </Text>
           </Pressable>
           <Pressable
             onPress={() => setPriceModalVisible(true)}
-            style={[
-              styles.filterButtonGalery,
-              { backgroundColor: theme.primary },
-            ]}
+            style={[styles.filterButtonGalery, { backgroundColor: theme.primary }]}
           >
-            <Text
-              style={[
-                styles.filterButtonTextGalery,
-                { color: theme.textPrimary },
-              ]}
-            >
+            <Text style={[styles.filterButtonTextGalery, { color: theme.textPrimary }]}>
               Precio
             </Text>
           </Pressable>
         </View>
 
-        <ScrollView
-          contentContainerStyle={styles.productsContainerGalery}
-          showsVerticalScrollIndicator={true}
-        >
+        <ScrollView contentContainerStyle={styles.productsContainerGalery}>
           {filteredProducts.length > 0 ? (
             <View style={styles.productsGridGalery}>
               {filteredProducts.map((product, index) => (
                 <ProductCard
-                  key={`${product.name}-${index}`}
+                  key={index}
                   name={product.name}
                   price={product.price}
                   imageUrl={product.imageUrl}
                   description={product.description}
                   stock={product.stock}
-                  categories={product.categories}
+                  categoriePrimary={product.categoriePrimary}
+                  categorieSecondary={product.categorieSecondary}
                 />
               ))}
             </View>
           ) : (
             <View style={styles.emptyStateGalery}>
-              <Text
-                style={[styles.emptyTextGalery, { color: theme.textPrimary }]}
-              >
+              <Text style={[styles.emptyTextGalery, { color: theme.textPrimary }]}>
                 No se encontraron productos
               </Text>
-              <Text
-                style={[
-                  styles.emptySubtextGalery,
-                  { color: theme.textSecondary },
-                ]}
-              >
+              <Text style={[styles.emptySubtextGalery, { color: theme.textSecondary }]}>
                 Intenta con otros términos de búsqueda o ajusta los filtros
               </Text>
             </View>
@@ -201,7 +170,6 @@ export default function Galeria() {
         setMaxPrice={setMaxPrice}
       />
     </SafeAreaView>
-    
   );
 }
 
