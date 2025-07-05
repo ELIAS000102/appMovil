@@ -1,4 +1,4 @@
-// File: shopApp/components/CategoryFilterModal.tsx
+
 import React from "react";
 import {
   Modal,
