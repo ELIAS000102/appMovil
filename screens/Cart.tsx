@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import themeManager from "@/Theme/ThemeManager";
 
 export type CartItem = {
   name: string;
@@ -54,6 +56,15 @@ export default function Cart({ visible, onClose }: Props) {
   const [refresh, setRefresh] = useState(false);
   const { getCart, removeItem, updateQuantity } = useCartFunctions();
   const items = getCart();
+  const [mode, setMode] = useState(themeManager.getMode());
+  const theme = themeManager.getTheme();
+
+  useEffect(() => {
+    themeManager.subscribe(setMode);
+    return () => {
+      themeManager.unsubscribe(setMode);
+    };
+  }, []);
 
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -80,67 +91,132 @@ export default function Cart({ visible, onClose }: Props) {
 
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Carrito</Text>
+      <View style={[styles.container, { backgroundColor: theme.background }]}>
+        <Text style={[styles.title, { color: theme.primary }]}>Mi carrito</Text>
+
         <FlatList
           data={items}
           keyExtractor={(item) => item.name}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item }) => (
-            <View style={styles.item}>
+            <View style={[styles.card, { backgroundColor: theme.primary }]}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.price}>S/. {item.price.toFixed(2)}</Text>
-                <Text style={styles.category}>
+                <Text style={[styles.name, { color: theme.textPrimary }]}>
+                  {item.name}
+                </Text>
+                <Text style={[styles.category, { color: theme.textSecondary }]}>
                   {item.categoriePrimary} / {item.categorieSecondary}
                 </Text>
+                <Text style={[styles.price, { color: theme.primary }]}>
+                  S/. {item.price.toFixed(2)}
+                </Text>
               </View>
-              <View style={styles.quantity}>
+
+              <View style={styles.controls}>
                 <TouchableOpacity onPress={() => decrease(item.name)}>
-                  <Ionicons name="remove-circle" size={24} />
+                  <Ionicons name="remove-circle" size={26} color={theme.primary} />
                 </TouchableOpacity>
-                <Text style={styles.quantityText}>{item.quantity}</Text>
+                <Text style={[styles.quantity, { color: theme.textPrimary }]}>
+                  {item.quantity}
+                </Text>
                 <TouchableOpacity onPress={() => increase(item.name)}>
-                  <Ionicons name="add-circle" size={24} />
+                  <Ionicons name="add-circle" size={26} color={theme.primary} />
                 </TouchableOpacity>
               </View>
+
               <TouchableOpacity onPress={() => remove(item.name)}>
-                <Ionicons name="trash" size={24} color="red" />
+                <Ionicons name="trash" size={24} color="#ff4d4d" />
               </TouchableOpacity>
             </View>
           )}
         />
-        <Text style={styles.total}>Total: S/. {total.toFixed(2)}</Text>
-        <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-          <Text style={styles.closeText}>Cerrar</Text>
-        </TouchableOpacity>
+
+        <View style={styles.footer}>
+          <Text style={[styles.total, { color: theme.primary }]}>
+            Total: <Text style={{ color: theme.secondary }}>S/. {total.toFixed(2)}</Text>
+          </Text>
+          <TouchableOpacity
+            onPress={onClose}
+            style={[styles.closeBtn, { backgroundColor: theme.primary }]}
+          >
+            <Text style={styles.closeText}>Cerrar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
 }
 
+const { width } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  item: {
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  card: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
-    paddingBottom: 8,
+    padding: 14,
+    borderRadius: 14,
+    marginBottom: 14,
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    gap: 12,
   },
-  name: { fontSize: 16, fontWeight: "500" },
-  price: { fontSize: 14, color: "#666" },
-  category: { fontSize: 12, color: "#999" },
-  quantity: { flexDirection: "row", alignItems: "center", marginHorizontal: 10 },
-  quantityText: { marginHorizontal: 8, fontSize: 16 },
-  total: { fontSize: 18, fontWeight: "bold", marginTop: 20 },
+  name: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  category: {
+    fontSize: 13,
+    marginTop: 2,
+  },
+  price: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginTop: 4,
+  },
+  controls: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 12,
+  },
+  quantity: {
+    marginHorizontal: 8,
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  total: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 14,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "transparent",
+  },
   closeBtn: {
-    marginTop: 20,
-    backgroundColor: "#000",
-    padding: 12,
-    borderRadius: 8,
+    padding: 14,
+    borderRadius: 10,
     alignItems: "center",
   },
-  closeText: { color: "#fff", fontWeight: "bold" },
+  closeText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });

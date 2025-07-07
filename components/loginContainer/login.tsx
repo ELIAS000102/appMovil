@@ -6,6 +6,7 @@ import {
   View,
   Alert,
   StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { login } from "../../authentication/authService";
@@ -20,18 +21,16 @@ const Login: React.FC<LoginProps> = ({ onSwitch, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<"light" | "dark">(themeManager.getMode());
 
   useEffect(() => {
     const loadTheme = async () => {
-      await themeManager.init(); // Carga desde AsyncStorage
+      await themeManager.init();
       setMode(themeManager.getMode());
       themeManager.subscribe(setMode);
     };
-
     loadTheme();
-
     return () => {
       themeManager.unsubscribe(setMode);
     };
@@ -40,12 +39,20 @@ const Login: React.FC<LoginProps> = ({ onSwitch, onClose }) => {
   const theme = themeManager.getTheme();
 
   const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Campos requeridos", "Por favor ingresa tu correo y contraseña.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const user = await login(email, password);
       Alert.alert("Bienvenido", `Hola ${user.username}`);
       onClose();
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Error", error.message || "No se pudo iniciar sesión");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,7 +98,7 @@ const Login: React.FC<LoginProps> = ({ onSwitch, onClose }) => {
           style={{
             position: "absolute",
             right: 10,
-            top: 7,
+            top: 12,
             padding: 5,
           }}
         >
@@ -106,10 +113,15 @@ const Login: React.FC<LoginProps> = ({ onSwitch, onClose }) => {
       <TouchableOpacity
         style={[styles.buttonLogin, { backgroundColor: theme.primary }]}
         onPress={handleLogin}
+        disabled={loading}
       >
-        <Text style={[styles.buttonTextLogin, { color: theme.textPrimary }]}>
-          Entrar
-        </Text>
+        {loading ? (
+          <ActivityIndicator color={theme.textPrimary} />
+        ) : (
+          <Text style={[styles.buttonTextLogin, { color: theme.textPrimary }]}>
+            Entrar
+          </Text>
+        )}
       </TouchableOpacity>
 
       <TouchableOpacity onPress={onSwitch}>
@@ -148,9 +160,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 6,
     marginBottom: 10,
+    alignItems: "center",
   },
   buttonTextLogin: {
-    textAlign: "center",
     fontWeight: "bold",
   },
   switchTextLogin: {

@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { useAuth } from '../authentication/useAuth';
 import { updateUser, logout } from '../authentication/authService';
 import LoginScreen from './user/loginScreen';
+import ManageProducts from '../components/adminComponents/ManageProducts';
 import themeManager from '@/Theme/ThemeManager';
 
 type EditableFieldKey = 'username' | 'email' | 'password' | 'phone' | 'address';
@@ -55,7 +56,7 @@ const EditableField = React.memo(
         <View style={styles.fieldContainerUser}>
           {isEditing ? (
             <TextInput
-              style={[styles.inputUser,{color:themedStyles.valueUser.color}]}
+              style={[styles.inputUser, { color: themedStyles.valueUser.color }]}
               value={value}
               onChangeText={onChange}
               onBlur={onEndEdit}
@@ -95,6 +96,7 @@ export default function User() {
   const [editingField, setEditingField] = useState<EditableFieldKey | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showProductsModal, setShowProductsModal] = useState(false);
   const [mode, setMode] = useState<'light' | 'dark'>(themeManager.getMode());
 
   useEffect(() => {
@@ -159,6 +161,11 @@ export default function User() {
   };
 
   const handleFinishEditing = () => {
+    if (!editableUser.username || !editableUser.email) {
+      Alert.alert('Campos obligatorios', 'El nombre de usuario y correo electrónico son requeridos.');
+      return;
+    }
+
     Alert.alert('¿Guardar cambios?', '¿Deseas guardar los cambios realizados?', [
       {
         text: 'Cancelar',
@@ -170,10 +177,14 @@ export default function User() {
       },
       {
         text: 'Guardar',
-        onPress: () => {
-          updateUser(editableUser);
-          setEditingField(null);
-          Alert.alert('Guardado', 'La información ha sido actualizada.');
+        onPress: async () => {
+          try {
+            await updateUser(editableUser);
+            setEditingField(null);
+            Alert.alert('Guardado', 'La información ha sido actualizada.');
+          } catch (error) {
+            Alert.alert('Error', 'No se pudo actualizar la información del usuario.');
+          }
         },
       },
     ]);
@@ -199,10 +210,13 @@ export default function User() {
       <View style={styles.profileSectionUser}>
         <View style={styles.profileImageContainerUser}>
           <Image
-            source={{ uri: user.profilePhoto || 'https://via.placeholder.com/150' }}
+            source={{ uri: editableUser.profilePhoto || 'https://via.placeholder.com/150' }}
             style={[styles.profileImageUser, { borderColor: theme.primary }]}
           />
-          <TouchableOpacity style={[styles.editPhotoButtonUser,{backgroundColor: theme.primary, borderColor:theme.background}]} onPress={() => Alert.alert('Editar foto', 'Funcionalidad no implementada')}>
+          <TouchableOpacity
+            style={[styles.editPhotoButtonUser, { backgroundColor: theme.primary, borderColor: theme.background }]}
+            onPress={() => Alert.alert('Editar foto', 'Funcionalidad en desarrollo')}
+          >
             <Icon name="camera" size={16} color={theme.textPrimary} />
           </TouchableOpacity>
         </View>
@@ -225,15 +239,28 @@ export default function User() {
               togglePassword={() => setShowPassword(!showPassword)}
               themedStyles={themedStyles}
             />
-            {idx < fields.length - 1 && <View style={[styles.dividerUser,{backgroundColor:theme.primary}]} />}
+            {idx < fields.length - 1 && <View style={[styles.dividerUser, { backgroundColor: theme.primary }]} />}
           </View>
         ))}
       </View>
 
-      <TouchableOpacity style={[styles.logoutButtonUser,{backgroundColor:theme.primary}]} onPress={logout}>
-        <Text style={[styles.logoutTextUser,{color: theme.textPrimary}]}>Cerrar sesión</Text>
-        <Icon name="sign-out" size={18} color="white" style={[styles.logoutIconUser,{color:theme.textPrimary}]} />
+      {user.status === "admin" && (
+        <TouchableOpacity
+          style={[styles.adminButton, { backgroundColor: theme.primary }]}
+          onPress={() => setShowProductsModal(true)}
+        >
+          <Text style={[styles.adminButtonText, { color: theme.textPrimary }]}>Administrar productos</Text>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity style={[styles.logoutButtonUser, { backgroundColor: theme.primary }]} onPress={logout}>
+        <Text style={[styles.logoutTextUser, { color: theme.textPrimary }]}>Cerrar sesión</Text>
+        <Icon name="sign-out" size={18} style={[styles.logoutIconUser, { color: theme.textPrimary }]} />
       </TouchableOpacity>
+
+      {showProductsModal && (
+        <ManageProducts isVisible={true} onClose={() => setShowProductsModal(false)} />
+      )}
     </ScrollView>
   );
 }
@@ -354,6 +381,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   loginButtonTextUser: {
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  adminButton: {
+    padding: 14,
+    borderRadius: 8,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 20,
+    marginBottom: 8,
+  },
+  adminButtonText: {
     fontWeight: '600',
     fontSize: 16,
   },

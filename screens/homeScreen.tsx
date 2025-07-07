@@ -1,5 +1,4 @@
-// screens/Galeria.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Pressable,
   SafeAreaView,
@@ -7,6 +6,10 @@ import {
   StyleSheet,
   Text,
   View,
+  ActivityIndicator,
+  Image,
+  Animated,
+  Easing,
 } from "react-native";
 
 import ButtonLogin from "@/components/buttonLogin";
@@ -25,6 +28,7 @@ import Cart from "../screens/Cart";
 export default function Galeria() {
   const [mode, setMode] = useState<"light" | "dark">(themeManager.getMode());
   const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showCartModal, setShowCartModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
@@ -37,6 +41,30 @@ export default function Galeria() {
   const { user } = useAuth();
   const theme = themeManager.getTheme();
 
+  const logoSource =
+    mode === "dark"
+      ? require("@/assets/recursos/ecanbezado oscuro.png")
+      : require("@/assets/recursos/ecanbezado claro.png");
+
+  // 🎯 Animación decorativa - rotación de rombo
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 4000,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
+
+  const spin = rotateAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
   useEffect(() => {
     themeManager.subscribe(setMode);
     return () => {
@@ -48,6 +76,7 @@ export default function Galeria() {
     fetchProducts().then((data) => {
       const validProducts = data.filter((p) => p && p.name);
       setProducts(validProducts);
+      setLoading(false);
     });
   }, []);
 
@@ -85,8 +114,42 @@ export default function Galeria() {
       return true;
     });
 
+  if (loading) {
+    return (
+      <SafeAreaView
+        style={[
+          styles.safeAreaGalery,
+          {
+            backgroundColor: theme.background,
+            justifyContent: "center",
+            alignItems: "center",
+          },
+        ]}
+      >
+        <Text style={{ color: theme.textPrimary, marginBottom: 16 }}>
+          Cargando productos...
+        </Text>
+        <ActivityIndicator size="large" color={theme.primary} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={[styles.safeAreaGalery, { backgroundColor: theme.background }]}>
+      {/* LOGO + DECORACIÓN */}
+      <View style={styles.headerTopGalery}>
+        <Image source={logoSource} style={styles.logoGalery} resizeMode="contain" />
+        <Animated.View
+          style={[
+            styles.decoracionRombo,
+            {
+              backgroundColor: theme.primary,
+              transform: [{ rotate: spin }],
+            },
+          ]}
+        />
+      </View>
+
       <View style={[styles.containerGalery, { backgroundColor: theme.background }]}>
         <View style={styles.headerGalery}>
           <View style={styles.leftContainerGalery}>
@@ -98,7 +161,10 @@ export default function Galeria() {
             ) : (
               <ButtonLogin />
             )}
-            <Cart visible={showCartModal} onClose={() => setShowCartModal(false)} />
+            <Cart
+              visible={showCartModal}
+              onClose={() => setShowCartModal(false)}
+            />
           </View>
         </View>
 
@@ -175,10 +241,28 @@ export default function Galeria() {
 
 const styles = StyleSheet.create({
   safeAreaGalery: { flex: 1 },
+  headerTopGalery: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 6,
+  },
+  logoGalery: {
+    width: 160,
+    height: 60,
+  },
+  decoracionRombo: {
+    width: 24,
+    height: 24,
+    transform: [{ rotate: "45deg" }],
+    marginRight: 8,
+    borderRadius: 4,
+  },
   containerGalery: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 16,
   },
   headerGalery: {
     flexDirection: "row",
